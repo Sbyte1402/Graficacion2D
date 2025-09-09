@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "cstdint": "cpp",
+        "memoria.h": "c",
+        "figuras.h": "c"
+    },
+    "cmake.sourceDirectory": "/home/sbyte_701/Documents/graficacion/SDL3-3.2.20"
+}
