@@ -5,18 +5,11 @@
 #include <stdlib.h>
 
 void push(Pila *pila, void *vector){
-    if(!pila){
-        Nodo *aux = crearNodo(vector);
-
-        pila -> cima = aux;
-        pila -> datos++;
-    }else{
-        Nodo *aux = crearNodo(vector);
+    Nodo *aux = crearNodo(vector);
     
-        aux -> sig = pila -> cima;
-        pila -> cima = aux;
-        pila -> datos++;
-    }
+    aux -> sig = pila -> cima;
+    pila -> cima = aux;
+    pila -> datos++;
 }
 
 void* pop(Pila *pila){
@@ -37,12 +30,11 @@ void* pop(Pila *pila){
 
 void freePila(Pila *pila){
     Nodo *aux;
-    do{
+
+    while (pila && pila->cima != NULL) {
         aux = pila -> cima;
-
         pila -> cima = aux -> sig;
-        aux -> sig = NULL;
-
+        
         free(aux);
-    }while(!pila);
+    }
 }

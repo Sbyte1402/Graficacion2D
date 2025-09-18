@@ -3,12 +3,14 @@
 #include "../global.h"
 #include "../estructuras/pila.h"
 #include "../memoria/memoria.h"
+#include "stdio.h"
 
 #include <stdlib.h>
 
 void fill_flat_bottom(Vec2 p1,Vec2 p2, Vec2 p3, uint32_t color);
 void fill_flat_top(Vec2 p1,Vec2 p2, Vec2 p3, uint32_t color);
 void ordenar_y(Vec2 *y);
+uint32_t getColor(Vec2 *pixel);
 
 void fill_figura(void *figura, uint32_t fill_color){
     Figuras *figuraCast = (Figuras*)figura;
@@ -19,7 +21,15 @@ void fill_figura(void *figura, uint32_t fill_color){
             break;}
         case CUADRO:{
             Cuadro *cuadCast = (Cuadro*)figuraCast;
-            fill_flood(&(cuadCast -> pos), fill_color);
+
+            int xM = cuadCast -> pos.unpack.x + (cuadCast -> w / 2);
+            int yM = cuadCast -> pos.unpack.y + (cuadCast -> h / 2);
+
+            Vec2 puntoM = {{xM, yM}};
+            puntoM.unpack.x = xM;
+            puntoM.unpack.y = yM;
+
+            fill_flood(&puntoM, fill_color);
             break;}
         case TRIAN:{
             Triangulo *trianCast = (Triangulo*)figuraCast;
@@ -33,55 +43,62 @@ void fill_figura(void *figura, uint32_t fill_color){
 }
 
 void fill_flood(Vec2 *pInicial, uint32_t fill_color){
-    Pila *pila = NULL;
-    char *verificado = (char*)calloc(estadosrender.w_height * estadosrender.w_width, sizeof(char));
-    Vec2 *pixel = pInicial;
-    int pos_pixel = (int)(pixel -> unpack.y) * estadosrender.w_width + (int)(pixel -> unpack.x);
+    Pila *pila = (Pila*)calloc(1, sizeof(Pila));
 
-    do{
-        push(pila, pixel);
+    int total_pixeles = estadosrender.w_height * estadosrender.w_width;
+    char *verificado = (char*)calloc(total_pixeles, sizeof(char));
 
-        if(pila){
-            pixel = pop(pila);
-            pos_pixel = (int)(pixel -> unpack.y) * estadosrender.w_width + (int)(pixel -> unpack.x);
+    Vec2 *pixel = malloc(sizeof(Vec2));
+    pixel->unpack.x = pInicial->unpack.x;
+    pixel->unpack.y = pInicial->unpack.y;
 
-            if(verificado[pos_pixel] == '0'){
-                draw_pixel(pixel -> unpack.x, pixel -> unpack.y, fill_color);
-                verificado[pos_pixel] = '1';
-            }
+    push(pila, pixel);
 
-            if(estadosrender.color_buffer[pos_pixel + 1] != fill_color && estadosrender.color_buffer[pos_pixel + 1] != estadosrender.clear_color.hex){
-                if(verificado[pos_pixel + 1] == '0'){
-                    Vec2 aux = {{pixel -> unpack.x + 1, pixel -> unpack.y}};
-                    push(pila, &aux);
-                }
-            }
+    uint32_t colorObj = getColor(pixel);
 
-            if(estadosrender.color_buffer[pos_pixel - 1] != fill_color && estadosrender.color_buffer[pos_pixel - 1] != estadosrender.clear_color.hex){
-                if(verificado[pos_pixel - 1] == '0'){
-                    Vec2 aux = {{pixel -> unpack.x - 1, pixel -> unpack.y}};
-                    push(pila, &aux);
-                }
-            }
-            
-            if(estadosrender.color_buffer[pos_pixel + estadosrender.w_width] != fill_color && estadosrender.color_buffer[pos_pixel + estadosrender.w_width] != estadosrender.clear_color.hex){
-                if(verificado[pos_pixel + estadosrender.w_width] == '0'){
-                    Vec2 aux = {{pixel -> unpack.x, pixel -> unpack.y + 1}};
-                    push(pila, &aux);
-                }
-            }
-            
-            if(estadosrender.color_buffer[pos_pixel - estadosrender.w_width] != fill_color && estadosrender.color_buffer[pos_pixel - estadosrender.w_width] != estadosrender.clear_color.hex){
-                if(verificado[pos_pixel - estadosrender.w_width] == '0'){
-                    Vec2 aux = {{pixel -> unpack.x, pixel -> unpack.y - 1}};
-                    push(pila, &aux);
+    while(pila -> cima != NULL){
+        pixel = (Vec2*)pop(pila);
+        int x = pixel -> unpack.x;
+        int y = pixel -> unpack.y;
+
+        int idx = y * estadosrender.w_width + x;
+
+        if(x >= 0 && x < estadosrender.w_width &&
+           y >= 0 && y < estadosrender.w_height &&
+           verificado[idx] == 0 &&
+           getColor(pixel) == colorObj)
+        {
+            draw_pixel(x, y, fill_color);
+            verificado[idx] = 1;
+
+            Vec2 vecinos[4] = {{{1, 0}},
+                               {{-1, 0}},
+                               {{0, 1}},
+                               {{0, -1}}};
+
+            for(int i = 0; i < 4; i++){
+                int newX = x + vecinos[i].unpack.x;
+                int newY = y + vecinos[i].unpack.y;
+
+                if(newX >= 0 && newX < estadosrender.w_width &&
+                   newY >= 0 && newY < estadosrender.w_height)
+                {
+                    int pixelPos = newY * estadosrender.w_width + newX;
+                    if(verificado[pixelPos] == 0){
+                        Vec2 *objetivo = malloc(sizeof(Vec2));
+                        objetivo->unpack.x = newX;
+                        objetivo->unpack.y = newY;
+                        push(pila, objetivo);
+                    }
                 }
             }
         }
-    }while(pila);
+        free(pixel);
+    }
 
     free(verificado);
     freePila(pila);
+    free(pila);
 }
 
 void fill_triangulo(Triangulo *triangulo, uint32_t color){
@@ -146,4 +163,8 @@ void fill_flat_top(Vec2 p1, Vec2 p2 ,Vec2 c, uint32_t color){
         xi -= mi;
         xf -= mf;
     }
+}
+
+uint32_t getColor(Vec2 *pixel){
+    return estadosrender.color_buffer[(int)pixel->unpack.y * estadosrender.w_width + (int)pixel->unpack.x];
 }

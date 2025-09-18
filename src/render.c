@@ -6,6 +6,7 @@
 #include "draw/figuras.h"
 #include "memoria/memoria.h"
 #include "color/colores.h"
+#include "GUI/boton.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -53,7 +54,8 @@ void render_input(void){
         // Buscar el pivote mas cerca
         // Obtener referencia de la figura
         // Modificar
-        printf("(%.3f, %.3f)\n", estadosrender.evento.motion.x, estadosrender.evento.motion.y);
+
+        // printf("(%.3f, %.3f)\n", estadosrender.evento.motion.x, estadosrender.evento.motion.y);
 
         Vec2 *pivote = pivote_mas_cerca((Vec2){{estadosrender.evento.motion.x,
                                                estadosrender.evento.motion.y}},
@@ -101,63 +103,122 @@ void copy_buffer_to_texture(){
 }
 
 void _Init(){
-    Vec2 pc1 = {{400.f, 360.f}};
-    Vec2 pc2 = {{600.f, 100.f}};
-    Vec2 pc3 = {{800.f, 360.f}};
+    {// Vec2 pc1 = {{400.f, 360.f}};
+    // Vec2 pc2 = {{600.f, 100.f}};
+    // Vec2 pc3 = {{800.f, 360.f}};
     
-    Linea linea = {
-        .p1 = (Vec2){{800, 100}},
-        .p2 = (Vec2){{600, 250}},
-        .offset_mem1 = {0},
-        .color = (Color){0xAB00ABFF},
-        .type = LINEA
-    };
+    // Linea linea = {
+    //     .p1 = (Vec2){{800, 100}},
+    //     .p2 = (Vec2){{600, 250}},
+    //     .offset_mem1 = {0},
+    //     .color = (Color){0xAB00ABFF},
+    //     .type = LINEA
+    // };
 
-    Curva curva = {
-        .p1 = pc1,
-        .p2 = pc2,
-        .p3 = pc3,
-        .color = (Color){0xFFFF00FF},
-        .type = CURVA
-    };
+    // Curva curva = {
+    //     .p1 = pc1,
+    //     .p2 = pc2,
+    //     .p3 = pc3,
+    //     .color = (Color){0xFFFF00FF},
+    //     .type = CURVA
+    // };
 
-    Circulo circ = {
-        .pos = {{estadosrender.w_width/2.f, estadosrender.w_height/2.f}},
-        .r = 20.f,
-        .vert = 32,
-        .offset_mem1 = {0},
-        .color = (Color){0x00FFFFFF},
-        .type = CIRC
-    };
+    // Circulo circ = {
+    //     .pos = {{estadosrender.w_width/2.f, estadosrender.w_height/2.f}},
+    //     .r = 20.f,
+    //     .vert = 32,
+    //     .offset_mem1 = {0},
+    //     .color = (Color){0x00FFFFFF},
+    //     .type = CIRC
+    // };
 
-    Cuadro cuadro = {
-        .pos = {.unpack = {.x = 140, .y = 140}},
-        .h = 200,
-        .w = 200,
-        .offset_mem1 = {0},
-        .color = (Color){0x140140FF},
-        .type = CUADRO
-    };
+    // Cuadro cuadro = {
+    //     .pos = {.unpack = {.x = 140, .y = 140}},
+    //     .h = 200,
+    //     .w = 200,
+    //     .offset_mem1 = {0},
+    //     .color = (Color){0x27C8F5FF},
+    //     .type = CUADRO
+    // };
 
-    Triangulo triangulo = {
-        .p1 = {.unpack = {.x = 400, .y = 360}},
-        .p2 = {.unpack = {.x = 600, .y = 100}},
-        .p3 = {.unpack = {.x = 800, .y = 360}},
-        .color = (Color){0x2AADBFFF},
-        .type = TRIAN
-    };
+    // Triangulo triangulo = {
+    //     .p1 = {.unpack = {.x = 400, .y = 360}},
+    //     .p2 = {.unpack = {.x = 600, .y = 100}},
+    //     .p3 = {.unpack = {.x = 800, .y = 360}},
+    //     .color = (Color){0x2AADBFFF},
+    //     .type = TRIAN
+    // };
+    
+    // Figuras test3 = {.circulo = circ};
+    // Figuras test4 = {.cuadro = cuadro};
+    // Figuras test5 = {.triangulo = triangulo};
 
-    Figuras test = {.linea = linea};
-    Figuras test2 = {.curva = curva};
-    Figuras test3 = {.circulo = circ};
-    Figuras test4 = {.cuadro = cuadro};
-    Figuras test5 = {.triangulo = triangulo};
+    // pushto_array(estadosrender.figuras_buffer, test3);
+    // pushto_array(estadosrender.figuras_buffer, test4);
+    // pushto_array(estadosrender.figuras_buffer, test5);
+    }
+    
+    // Botones
+    int bttnHeight = 40;
+    int bttnWidth = bttnHeight + (bttnHeight / 3);
 
-    pushto_array(estadosrender.figuras_buffer, test);
-    pushto_array(estadosrender.figuras_buffer, test2);
-    pushto_array(estadosrender.figuras_buffer, test3);
-    pushto_array(estadosrender.figuras_buffer, test4);
-    pushto_array(estadosrender.figuras_buffer, test5);
+    int xPosInit1 = 400;
+    int yPosInit1 = 400;
+
+    int xPosInit2 = 500;
+    int yPosInit2 = 400;
+
+    int xPosInit3 = 600;
+    int yPosInit3 = 400;
+
+    Cuadro bttn1_labelRaw = {.pos = {.unpack = {.x = xPosInit1 + (bttnWidth / 3.f),
+                                                .y = yPosInit1 + (bttnHeight / 5.f)}},
+                             .w = (bttnHeight / 5.f) * 3,
+                             .h = (bttnHeight / 5.f) * 3,
+                             .color = (Color){0xFFFFFFFF},
+                             .offset_mem1 = {0},
+                             .type = CUADRO};
+
+    Circulo bttn2_labelRaw = {.pos = {.unpack = {.x = xPosInit2 + bttnWidth / 2.f, .y = yPosInit2 + bttnHeight / 2.f}},
+                              .r = (bttnHeight / 10.f) * 3,
+                              .offset_mem1 = {0},
+                              .color = (Color){0xFFFFFFFF},
+                              .type = CIRC};
+    
+    Triangulo bttn3_labelRaw = {.p1 = {.unpack = {.x = xPosInit3 + (bttnWidth / 3.f),
+                                                  .y = yPosInit3 + (bttnHeight / 3.f) * 2}},
+                                .p2 = {.unpack = {.x = xPosInit3 + (bttnWidth / 2.f),
+                                                  .y = yPosInit3 + (bttnHeight / 3.f)}},
+                                .p3 = {.unpack = {.x = xPosInit3 + (bttnWidth / 3.f) * 2,
+                                                  .y = yPosInit3 + (bttnHeight / 3.f) * 2}},
+                                .color = (Color){0xFFFFFFFF},
+                                .type = TRIAN};
+
+    Figuras bttn1_label = {.cuadro = bttn1_labelRaw};
+    Figuras bttn2_label = {.circulo = bttn2_labelRaw};
+    Figuras bttn3_label = {.triangulo = bttn3_labelRaw};
+    
+    Button bttn1 = {.x = xPosInit1,
+                    .y = yPosInit1,
+                    .width = bttnWidth,
+                    .height = bttnHeight,
+                    .label = bttn1_label};
+
+    Button bttn2 = {.x = xPosInit2,
+                    .y = yPosInit2,
+                    .width = bttnWidth,
+                    .height = bttnHeight,
+                    .label = bttn2_label};
+    
+    Button bttn3 = {.x = xPosInit3,
+                    .y = yPosInit3,
+                    .width = bttnWidth,
+                    .height = bttnHeight,
+                    .label = bttn3_label};
+
+    pushto_array(estadosrender.botones_buffer, bttn1);
+    pushto_array(estadosrender.botones_buffer, bttn2);
+    pushto_array(estadosrender.botones_buffer, bttn3);
 }
 
 void update(){
@@ -233,8 +294,19 @@ void update(){
     // draw_figura(&test4);
     // draw_figura(&test5);
     }
+    {
+    // // Ciclo del draw
+    // for(int i = 0; i < array_size(estadosrender.figuras_buffer); i++){
+    //     draw_figura(&estadosrender.figuras_buffer[i]);
+    // }
+    }
 
-    // Ciclo del draw
+    // Chamba
+    for(int i = 0; i < array_size(estadosrender.botones_buffer); i++){
+        draw_boton(&estadosrender.botones_buffer[i]);
+        eventListener(&estadosrender.botones_buffer[i]);
+    }
+
     for(int i = 0; i < array_size(estadosrender.figuras_buffer); i++){
         draw_figura(&estadosrender.figuras_buffer[i]);
     }

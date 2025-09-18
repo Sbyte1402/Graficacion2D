@@ -25,8 +25,11 @@ void grabar_imagen(void);
 SDL_Window *window = NULL;
 
 int main(int argc, char** argv){
+    
     render_init();
+    
     _Init();
+    
 
     while(estadosrender.run){
         int delay_frame = FRAME_TARGET_TIME -(SDL_GetTicks()-frame_tiempo_prev);
