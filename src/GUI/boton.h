@@ -11,7 +11,7 @@ typedef struct _button{
 }Button;
 
 void draw_boton(Button *button);
-void eventListener(Button *button);
+void eventListenerCreate(Button *button);
 
 Figuras* createCuad(void);
 Figuras* createCirc(void);

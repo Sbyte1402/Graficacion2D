@@ -60,18 +60,19 @@ void render_input(void){
         Vec2 *pivote = pivote_mas_cerca((Vec2){{estadosrender.evento.motion.x,
                                                estadosrender.evento.motion.y}},
                                                estadosrender.figuras_buffer,
-                                               10.f);
+                                               20.f);
 
         if(!punto_seleccionado){
             punto_seleccionado = pivote_mas_cerca((Vec2){{estadosrender.evento.motion.x,
                                                           estadosrender.evento.motion.y}},
                                                           estadosrender.figuras_buffer,
-                                                          10.f);
+                                                          20.f);
         }
 
         if(punto_seleccionado){
             printf("Punto cercano (%.3f, %.3f)\n",pivote -> unpack.x, pivote -> unpack.y);
         }
+
     } else if (estadosrender.evento.type == SDL_EVENT_MOUSE_BUTTON_UP){
         // Modificar la figura
         if(punto_seleccionado){
@@ -162,14 +163,21 @@ void _Init(){
     int bttnHeight = 40;
     int bttnWidth = bttnHeight + (bttnHeight / 3);
 
-    int xPosInit1 = 400;
-    int yPosInit1 = 400;
+    int xPosInit1 = 20;
+    int yPosInit1 = 20;
 
-    int xPosInit2 = 500;
-    int yPosInit2 = 400;
+    int xPosInit2 = 90;
+    int yPosInit2 = 20;
 
-    int xPosInit3 = 600;
-    int yPosInit3 = 400;
+    int xPosInit3 = 160;
+    int yPosInit3 = 20;
+
+    int xPosInit4 = 1010;
+    int yPosInit4 = 20;
+    int xPosInit5 = 940;
+    int yPosInit5 = 20;
+    int xPosInit6 = 870;
+    int yPosInit6 = 20;
 
     Cuadro bttn1_labelRaw = {.pos = {.unpack = {.x = xPosInit1 + (bttnWidth / 3.f),
                                                 .y = yPosInit1 + (bttnHeight / 5.f)}},
@@ -194,9 +202,37 @@ void _Init(){
                                 .color = (Color){0xFFFFFFFF},
                                 .type = TRIAN};
 
+    Cuadro bttnColorR_labelRaw = {.pos = {.unpack = {.x = xPosInit4 + (bttnWidth / 3.f),
+                                                    .y = yPosInit4 + (bttnHeight / 5.f)}},
+                                 .w = (bttnHeight / 5.f) * 3,
+                                 .h = (bttnHeight / 5.f) * 3,
+                                 .color = (Color){0xFF0000FF},
+                                 .offset_mem1 = {0},
+                                 .type = CUADRO};
+
+    Cuadro bttnColorG_labelRaw = {.pos = {.unpack = {.x = xPosInit5 + (bttnWidth / 3.f),
+                                                    .y = yPosInit5 + (bttnHeight / 5.f)}},
+                                 .w = (bttnHeight / 5.f) * 3,
+                                 .h = (bttnHeight / 5.f) * 3,
+                                 .color = (Color){0x00FF00FF},
+                                 .offset_mem1 = {0},
+                                 .type = CUADRO};
+    
+    Cuadro bttnColorB_labelRaw = {.pos = {.unpack = {.x = xPosInit6 + (bttnWidth / 3.f),
+                                                    .y = yPosInit6 + (bttnHeight / 5.f)}},
+                                 .w = (bttnHeight / 5.f) * 3,
+                                 .h = (bttnHeight / 5.f) * 3,
+                                 .color = (Color){0x0000FFFF},
+                                 .offset_mem1 = {0},
+                                 .type = CUADRO};
+
     Figuras bttn1_label = {.cuadro = bttn1_labelRaw};
     Figuras bttn2_label = {.circulo = bttn2_labelRaw};
     Figuras bttn3_label = {.triangulo = bttn3_labelRaw};
+
+    Figuras bttnColorR = {.cuadro = bttnColorR_labelRaw};
+    Figuras bttnColorG = {.cuadro = bttnColorG_labelRaw};
+    Figuras bttnColorB = {.cuadro = bttnColorB_labelRaw};
     
     Button bttn1 = {.x = xPosInit1,
                     .y = yPosInit1,
@@ -216,9 +252,28 @@ void _Init(){
                     .height = bttnHeight,
                     .label = bttn3_label};
 
+    Button bttnR = {.x = xPosInit4,
+                    .y = yPosInit4,
+                    .width = bttnWidth,
+                    .height = bttnHeight,
+                    .label = bttnColorR};
+    Button bttnG = {.x = xPosInit5,
+                    .y = yPosInit5,
+                    .width = bttnWidth,
+                    .height = bttnHeight,
+                    .label = bttnColorG};
+    Button bttnB = {.x = xPosInit6,
+                    .y = yPosInit6,
+                    .width = bttnWidth,
+                    .height = bttnHeight,
+                    .label = bttnColorB};
+
     pushto_array(estadosrender.botones_buffer, bttn1);
     pushto_array(estadosrender.botones_buffer, bttn2);
     pushto_array(estadosrender.botones_buffer, bttn3);
+    pushto_array(estadosrender.botones_buffer, bttnR);
+    pushto_array(estadosrender.botones_buffer, bttnG);
+    pushto_array(estadosrender.botones_buffer, bttnB);
 }
 
 void update(){
@@ -304,7 +359,7 @@ void update(){
     // Chamba
     for(int i = 0; i < array_size(estadosrender.botones_buffer); i++){
         draw_boton(&estadosrender.botones_buffer[i]);
-        eventListener(&estadosrender.botones_buffer[i]);
+        eventListenerCreate(&estadosrender.botones_buffer[i]);
     }
 
     for(int i = 0; i < array_size(estadosrender.figuras_buffer); i++){

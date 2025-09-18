@@ -4,7 +4,7 @@
 #include <math.h>
 
 #define LINEA_BRESSENHAM 1
-#define ANTI_ALIASING 1
+#define ANTI_ALIASING 0
 
 void draw_linea(int x0, int y0, int x1, int y1, uint32_t color){
     #if LINEA_BRUTA

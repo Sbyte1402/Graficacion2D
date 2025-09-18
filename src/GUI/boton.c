@@ -1,4 +1,5 @@
 #include "boton.h"
+#include "../render.h"
 #include "../global.h"
 #include "../draw/draw.h"
 #include "../draw/figuras.h"
@@ -15,35 +16,51 @@ void draw_boton(Button *button){
     draw_figura(&(button -> label));
 }
 
-void eventListener(Button *button){    
+void eventListenerCreate(Button *button){    
     if(estadosrender.evento.motion.x >= button -> x &&
         estadosrender.evento.motion.x <= (button -> x + button -> width) &&
         estadosrender.evento.motion.y >= button -> y &&
         estadosrender.evento.motion.y <= (button -> y + button -> height) &&
         estadosrender.evento.type == SDL_EVENT_MOUSE_BUTTON_DOWN){    
         
-        switch(button -> label.data.type){
-            case CUADRO:                
-                printf("Boton1 encontrado...\n");
-                Figuras *prueba = createCuad();
+        if(button->label.cuadro.color.hex == 0xFFFFFFFF){
+            switch(button -> label.data.type){
+                case CUADRO:                
+                    printf("Boton1 encontrado...\n");
+                    Figuras cuadrado = createCuad();
 
-                pushto_array(estadosrender.figuras_buffer, *prueba);
-                break;
-            case CIRC:
-                printf("Boton2 encontrado...\n");
-                break;
-            case TRIAN:
-                printf("Boton3 encontrado...\n");
-                break;
-            case LINEA:
-                break;
-            case CURVA:
-                break;    
+                    pushto_array(estadosrender.figuras_buffer, cuadrado);
+                    printf("Cuadrado creado...\n");
+                    break;
+                case CIRC:
+                    printf("Boton2 encontrado...\n");
+                    Figuras *circulo = createCirc();
+
+                    pushto_array(estadosrender.figuras_buffer, *circulo);
+                    printf("Circulo creado...\n");
+                    break;
+                case TRIAN:
+                    printf("Boton3 encontrado...\n");
+                    Figuras *triangulo = createTrian();
+
+                    pushto_array(estadosrender.figuras_buffer, *triangulo);
+                    printf("Triangulo creado...\n");
+                    break;
+                default:
+                    break;    
+            }
+        }else{
+            uint32_t color = button -> label.cuadro.color.hex;
+            
+            for(int i = 0; i < array_size(estadosrender.figuras_buffer); i++){
+                estadosrender.figuras_buffer[i].
+                cuadro.color.hex = color;
+            }
         }
     }
 }
 
-Figuras* createCuad(){
+Figuras createCuad(){
     Figuras *cuadro = (Figuras*)calloc(1, sizeof(Figuras));
 
     cuadro -> cuadro.pos.unpack.x = estadosrender.w_width / 3.f;
@@ -55,5 +72,37 @@ Figuras* createCuad(){
     cuadro -> cuadro.color = (Color){0xFFFFFFFF};
     cuadro -> cuadro.type = CUADRO;
 
-    return cuadro;
+    return *cuadro;
+}
+
+Figuras* createCirc(){
+    Figuras *circulo = (Figuras*)calloc(1, sizeof(Figuras));
+
+    circulo -> circulo.pos.unpack.x = estadosrender.w_width / 2.f;
+    circulo -> circulo.pos.unpack.y = estadosrender.w_height / 2.f;
+
+    circulo -> circulo.r = 50;
+
+    circulo -> circulo.color = (Color){0xFFFFFFFF};
+    circulo -> circulo.type = CIRC;
+
+    return circulo;
+}
+
+Figuras* createTrian(){
+    Figuras *triangulo = (Figuras*)calloc(1, sizeof(Figuras));
+
+    triangulo -> triangulo.p1.unpack.x = estadosrender.w_width / 8.f * 4;
+    triangulo -> triangulo.p1.unpack.y = estadosrender.w_height / 2.f;
+
+    triangulo -> triangulo.p2.unpack.x = estadosrender.w_width / 2.f;
+    triangulo -> triangulo.p2.unpack.y = estadosrender.w_height / 8.f * 3;
+
+    triangulo -> triangulo.p3.unpack.x = estadosrender.w_width / 8.f * 5;
+    triangulo -> triangulo.p3.unpack.y = estadosrender.w_height / 2.f;
+
+    triangulo -> triangulo.color = (Color){0xFFFFFFFF};
+    triangulo -> triangulo.type = TRIAN;
+
+    return triangulo;
 }
