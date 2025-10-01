@@ -27,9 +27,9 @@ void eventListenerCreate(Button *button){
             switch(button -> label.data.type){
                 case CUADRO:                
                     printf("Boton1 encontrado...\n");
-                    Figuras cuadrado = createCuad();
+                    Figuras *cuadrado = createCuad();
 
-                    pushto_array(estadosrender.figuras_buffer, cuadrado);
+                    pushto_array(estadosrender.figuras_buffer, *cuadrado);
                     printf("Cuadrado creado...\n");
                     break;
                 case CIRC:
@@ -60,7 +60,7 @@ void eventListenerCreate(Button *button){
     }
 }
 
-Figuras createCuad(){
+Figuras* createCuad(){
     Figuras *cuadro = (Figuras*)calloc(1, sizeof(Figuras));
 
     cuadro -> cuadro.pos.unpack.x = estadosrender.w_width / 3.f;
@@ -72,7 +72,7 @@ Figuras createCuad(){
     cuadro -> cuadro.color = (Color){0xFFFFFFFF};
     cuadro -> cuadro.type = CUADRO;
 
-    return *cuadro;
+    return cuadro;
 }
 
 Figuras* createCirc(){
@@ -92,14 +92,14 @@ Figuras* createCirc(){
 Figuras* createTrian(){
     Figuras *triangulo = (Figuras*)calloc(1, sizeof(Figuras));
 
-    triangulo -> triangulo.p1.unpack.x = estadosrender.w_width / 8.f * 4;
-    triangulo -> triangulo.p1.unpack.y = estadosrender.w_height / 2.f;
+    triangulo -> triangulo.pos[0] = (Vec2){{estadosrender.w_width / 8.f * 4,
+                                            estadosrender.w_height / 2.f}};
 
-    triangulo -> triangulo.p2.unpack.x = estadosrender.w_width / 2.f;
-    triangulo -> triangulo.p2.unpack.y = estadosrender.w_height / 8.f * 3;
+    triangulo -> triangulo.pos[1] = (Vec2){{estadosrender.w_width / 2.f,
+                                            estadosrender.w_height / 8.f * 3}};
 
-    triangulo -> triangulo.p3.unpack.x = estadosrender.w_width / 8.f * 5;
-    triangulo -> triangulo.p3.unpack.y = estadosrender.w_height / 2.f;
+    triangulo -> triangulo.pos[2] = (Vec2){{estadosrender.w_width / 8.f * 5,
+                                            estadosrender.w_height / 2.f}};
 
     triangulo -> triangulo.color = (Color){0xFFFFFFFF};
     triangulo -> triangulo.type = TRIAN;

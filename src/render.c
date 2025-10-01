@@ -1,48 +1,48 @@
 #include "render.h"
-#include "draw/draw.h"
-#include "draw/linea.h"
 #include "math/lerp.h"
-#include "math/vectores.h"
-#include "draw/figuras.h"
-#include "memoria/memoria.h"
-#include "color/colores.h"
+#include "draw/draw.h"
 #include "GUI/boton.h"
+#include "draw/linea.h"
+#include "math/matrix.h"
+#include "draw/figuras.h"
+#include "math/vectores.h"
+#include "color/colores.h"
+#include "memoria/memoria.h"
 
 #include <math.h>
 #include <stdio.h>
 
 Vec2 *punto_seleccionado = NULL;
 
-Vec2* pivote_mas_cerca(Vec2 mp, Figuras *figs, float umbral){
-    
-    int a = 0;
-    int b = array_size(figs) - 1;
-    
-    float low;
-    float high;
-    float centro;
-    for(int i = 0; i < array_size(figs); i++){
-        int r = (a + b) / 2;
-        low = distanciav2(mp, figs[a].cuadro.pos);
-        high = distanciav2(mp, figs[b].cuadro.pos);
-        centro = distanciav2(mp, figs[r].cuadro.pos);
+void transformar(void){
 
-        if(fabs(low) <= umbral){
-            return &figs[a].cuadro.pos;
-        } else if (fabs(high) <= umbral) {
-            return &figs[b].cuadro.pos;
-        } else if (fabs(centro) <= umbral){
-            return &figs[r].cuadro.pos;
+    int tam = array_size(estadosrender.figuras_buffer);
+	// Por cada figura
+    for(int i = 0; i < tam; ++i){
+        Figuras *fig = &estadosrender.figuras_buffer[i];
+
+        if(fig -> data.type != TRIAN) continue;
+
+        Triangulo *trian = (Triangulo*)fig;
+		// Por cada vertice
+        for(int v = 0; v < 3; ++v){
+			// Crear matriz transformacion (eye)
+            Mat4 mat_trans = mat4_eye();
+			// Escalar la matriz transformacion
+            mat4_push_escala(&mat_trans, (Vec3){{1.f, 1.f ,1.f}});
+			// trasladar la matriz trasndformacion
+            mat4_push_traslado(&mat_trans, (Vec3){{0.01f, 0.f ,0.f}});
+			// Rotar la matriz transformacion
+            mat4_push_rotar(&mat_trans, (Vec3){{0.f, 0.f ,0.f}});
+			// Producto punto entre matriz transformacion y vertice
+            Vec4 vertice = {{trian -> pos[v].unpack.x, trian -> pos[v].unpack.y, 1.f, 1.f}};
+            Vec4 vf = mat4_dot_vec4(&mat_trans, &vertice);
+			// Reemplazar vertice
+            trian -> pos[v].unpack.x = vf.unpack.x;
+            trian -> pos[v].unpack.y = vf.unpack.y;
         }
 
-        if(r < b){
-            b = r;
-        } else if (r > a){
-            a = r;
-        }
     }
-
-    return NULL;
 }
 
 void render_input(void){
@@ -193,12 +193,12 @@ void _Init(){
                               .color = (Color){0xFFFFFFFF},
                               .type = CIRC};
     
-    Triangulo bttn3_labelRaw = {.p1 = {.unpack = {.x = xPosInit3 + (bttnWidth / 3.f),
-                                                  .y = yPosInit3 + (bttnHeight / 3.f) * 2}},
-                                .p2 = {.unpack = {.x = xPosInit3 + (bttnWidth / 2.f),
-                                                  .y = yPosInit3 + (bttnHeight / 3.f)}},
-                                .p3 = {.unpack = {.x = xPosInit3 + (bttnWidth / 3.f) * 2,
-                                                  .y = yPosInit3 + (bttnHeight / 3.f) * 2}},
+    Triangulo bttn3_labelRaw = {.pos[0] = (Vec2){{xPosInit3 + (bttnWidth / 3.f),
+                                                 yPosInit3 + (bttnHeight / 3.f) * 2}},
+                                .pos[1] = (Vec2){{xPosInit3 + (bttnWidth / 2.f),
+                                                 yPosInit3 + (bttnHeight / 3.f)}},
+                                .pos[2] = (Vec2){{xPosInit3 + (bttnWidth / 3.f) * 2,
+                                                 yPosInit3 + (bttnHeight / 3.f) * 2}},
                                 .color = (Color){0xFFFFFFFF},
                                 .type = TRIAN};
 
@@ -365,8 +365,41 @@ void update(){
     for(int i = 0; i < array_size(estadosrender.figuras_buffer); i++){
         draw_figura(&estadosrender.figuras_buffer[i]);
     }
+    transformar();
 }
 
 void render_frame(){
     SDL_RenderPresent(estadosrender.renderer);
+}
+
+Vec2* pivote_mas_cerca(Vec2 mp, Figuras *figs, float umbral){
+    
+    int a = 0;
+    int b = array_size(figs) - 1;
+    
+    float low;
+    float high;
+    float centro;
+    for(int i = 0; i < array_size(figs); i++){
+        int r = (a + b) / 2;
+        low = distanciav2(mp, figs[a].cuadro.pos);
+        high = distanciav2(mp, figs[b].cuadro.pos);
+        centro = distanciav2(mp, figs[r].cuadro.pos);
+
+        if(fabs(low) <= umbral){
+            return &figs[a].cuadro.pos;
+        } else if (fabs(high) <= umbral) {
+            return &figs[b].cuadro.pos;
+        } else if (fabs(centro) <= umbral){
+            return &figs[r].cuadro.pos;
+        }
+
+        if(r < b){
+            b = r;
+        } else if (r > a){
+            a = r;
+        }
+    }
+
+    return NULL;
 }

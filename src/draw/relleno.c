@@ -104,8 +104,11 @@ void fill_flood(Vec2 *pInicial, uint32_t fill_color){
 void fill_triangulo(Triangulo *triangulo, uint32_t color){
     // Ordenar
     float cy, cx;
+    Vec2 y[3];
 
-    Vec2 y[3] = {triangulo -> p1, triangulo -> p2, triangulo -> p3};
+    y[0] = triangulo -> pos[0];
+    y[1] = triangulo -> pos[1];
+    y[2] = triangulo -> pos[2];
     ordenar_y(y);
 
     // Pintar
